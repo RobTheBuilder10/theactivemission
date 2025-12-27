@@ -1,316 +1,378 @@
-/* THE ACTIVE MISSION - SYSTEM CORE
-    Includes: Router, Loader, HUD Logic, Data Renderers
-*/
+/**
+ * THE ACTIVE MISSION - CORE SYSTEM
+ * Architecture: SPA (Single Page Application)
+ */
 
-// --- CONFIGURATION & STATE ---
 const app = {
-    currentPage: 'home',
-    startTime: Date.now(),
-    coords: null
-};
+    state: {
+        page: 'home',
+        startTime: Date.now()
+    },
 
-// --- CONTENT TEMPLATES (SPA) ---
-const templates = {
-    home: `
-        <section class="hero-block">
-            <h1 class="display-title">THE ACTIVE<br>MISSION</h1>
-            <p class="hero-subtitle">LIVE LIFE ON PURPOSE.</p>
-            <div class="cta-group">
-                <button class="btn-gold" onclick="app.router('coaching')">JOIN THE MISSION</button>
-                <button class="btn-outline" onclick="app.router('programs')">BROWSE PROGRAMS</button>
-            </div>
-        </section>
+    // --- CONTENT DATABASE (Full Content) ---
+    content: {
+        home: `
+            <article class="page-view">
+                <section class="hero-section">
+                    <div class="hero-content">
+                        <span class="hero-sub">OPERATIONAL READINESS: ACTIVE</span>
+                        <h1>FORGING DURABLE HUMANS</h1>
+                        <p style="font-size: 1.2rem; color: var(--light-gray); margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+                            We build athletes who are physically capable, mentally hardened, and spiritually grounded. This is not for the faint of heart. This is training for life.
+                        </p>
+                        <div class="cta-group">
+                            <button class="btn-gold" onclick="app.router('coaching')">JOIN THE MISSION</button>
+                            <button class="btn-outline" onclick="app.router('programs')">FIELD MANUALS</button>
+                        </div>
+                    </div>
+                </section>
 
-        <section class="grid-system">
-            <div class="card" onclick="app.router('philosophy')">
-                <span class="card-tag">01 // ETHOS</span>
-                <h3>PHILOSOPHY</h3>
-                <p>We build durable humans through faith, fitness, and discipline.</p>
-            </div>
-            <div class="card" onclick="app.router('podcast')">
-                <span class="card-tag">02 // INTEL</span>
-                <h3>PODCAST</h3>
-                <p>Tactical conversations on performance and culture.</p>
-            </div>
-            <div class="card" onclick="app.router('events')">
-                <span class="card-tag">03 // DEPLOYMENT</span>
-                <h3>EVENTS</h3>
-                <p>Kickoff Weekend: Sept 2026. Get briefing.</p>
-            </div>
-        </section>
-    `,
+                <section class="grid-system">
+                    <div class="card" role="button" tabindex="0" onclick="app.router('philosophy')" onkeydown="if(event.key === 'Enter') app.router('philosophy')">
+                        <div class="card-header">
+                            <span class="card-tag">01 // ETHOS</span>
+                            <h3>PHILOSOPHY</h3>
+                        </div>
+                        <div class="card-body">
+                            <p>Intentional suffering produces endurance. Explore our methodology on discipline, faith, and the hybrid athlete lifestyle.</p>
+                        </div>
+                        <div class="card-footer">
+                            <span class="gold-text">READ MANIFESTO &rarr;</span>
+                        </div>
+                    </div>
 
-    philosophy: `
-        <section>
-            <h1>TRAINING PHILOSOPHY</h1>
-            <hr style="border-color: var(--gold); margin: 1rem 0;">
-            <p class="hero-subtitle">"LIVE LIFE ON PURPOSE."</p>
-            <div class="grid-system">
-                <div class="card"><h3>DISCIPLINE</h3><p>Motivation is fleeting. Discipline is the framework for freedom.</p></div>
-                <div class="card"><h3>STRENGTH</h3><p>Capacity to handle the load of life, physically and spiritually.</p></div>
-                <div class="card"><h3>NATURE</h3><p>We are designed for the wild. Get outside. Get uncomfortable.</p></div>
-            </div>
-        </section>
-    `,
+                    <div class="card" role="button" tabindex="0" onclick="app.router('programs')" onkeydown="if(event.key === 'Enter') app.router('programs')">
+                         <div class="card-header">
+                            <span class="card-tag">02 // PROTOCOLS</span>
+                            <h3>TRAINING</h3>
+                        </div>
+                         <div class="card-body">
+                            <p>From OCR speed work to heavy rucking. Access our downloadable programming for specific mission profiles.</p>
+                        </div>
+                        <div class="card-footer">
+                            <span class="gold-text">ACCESS DATA &rarr;</span>
+                        </div>
+                    </div>
 
-    coaching: `
-        <section>
-            <h1>COACHING TIERS</h1>
-            <div class="grid-system">
-                <div class="card">
-                    <span class="card-tag">TIER 1</span>
-                    <h3>1:1 PERFORMANCE</h3>
-                    <p>Fully individualized programming + nutrition.</p>
-                    <button class="btn-gold" style="margin-top:1rem; width:100%">APPLY</button>
-                </div>
-                 <div class="card">
-                    <span class="card-tag">TIER 2</span>
-                    <h3>HYBRID GROUP</h3>
-                    <p>Team training for OCR and endurance athletes.</p>
-                    <button class="btn-outline" style="margin-top:1rem; width:100%">JOIN WAITLIST</button>
-                </div>
-            </div>
-        </section>
-    `,
+                    <div class="card" role="button" tabindex="0" onclick="app.router('podcast')" onkeydown="if(event.key === 'Enter') app.router('podcast')">
+                         <div class="card-header">
+                            <span class="card-tag">03 // INTEL</span>
+                            <h3>PODCAST</h3>
+                        </div>
+                         <div class="card-body">
+                            <p>Tactical conversations on culture, theology, and human performance. Unfiltered weekly briefings.</p>
+                        </div>
+                        <div class="card-footer">
+                            <span class="gold-text">LISTEN NOW &rarr;</span>
+                        </div>
+                    </div>
+                </section>
+            </article>
+        `,
 
-    programs: `
-        <section>
-            <h1>FIELD MANUALS // PROGRAMS</h1>
-            <p>Downloadable protocols. Build the engine.</p>
-            <div class="grid-system" id="program-grid">
-                </div>
-        </section>
-    `,
-
-    podcast: `
-        <section class="podcast-container">
-            <h1>THE ACTIVE MISSION PODCAST</h1>
-            <p>Unfiltered discussion on faith, fitness, and freedom.</p>
-            
-            <div class="platform-links">
-                <button class="btn-gold" onclick="window.open('#', '_blank')">WATCH ON YOUTUBE</button>
-                <button class="btn-outline" onclick="window.open('#', '_blank')">RUMBLE (UNCENSORED)</button>
-            </div>
-
-            <div class="yt-embed-placeholder mono-text">
-                [ YOUTUBE PLAYLIST EMBED PLACEHOLDER ]
-            </div>
-        </section>
-    `,
-
-    events: `
-        <section>
-            <h1>MISSION EVENTS</h1>
-            <div class="event-row">
-                <h2>KICKOFF WEEKEND '26</h2>
-                <div class="event-meta mono-text">
-                    <span>DATE: 12-13 SEP 2026</span> | 
-                    <span>LOC: QUEEN CREEK, AZ</span>
-                </div>
-                <p>The inaugural gathering. Training, fellowship, and field work. Pack light, move fast.</p>
+        philosophy: `
+            <article class="page-view">
+                <header style="border-bottom: 1px solid var(--gold); margin-bottom: 3rem; padding-bottom: 1rem;">
+                    <span class="mono-text gold-text">SECTION: ETHOS</span>
+                    <h1>LIVE LIFE ON PURPOSE.</h1>
+                </header>
                 
-                <h4 style="margin-top:2rem">ITINERARY</h4>
-                <ul class="program-specs">
-                    <li>0600: RUCK MARCH</li>
-                    <li>0900: TACTICAL STRENGTH</li>
-                    <li>1300: RECOVERY PROTOCOLS</li>
-                    <li>1800: FELLOWSHIP & FOOD</li>
-                </ul>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 4rem;">
+                    <div>
+                        <h3>01. THE HYBRID STANDARD</h3>
+                        <p style="margin-bottom: 1.5rem; color: var(--light-gray);">
+                            Specialization is for insects. The modern world requires a human who can run fast, lift heavy, and endure the elements. We train to be useful in any scenario.
+                        </p>
+                        <ul class="tech-list">
+                            <li>Aerobic Capacity (Engine)</li>
+                            <li>Structural Integrity (Durability)</li>
+                            <li>Absolute Strength (Force)</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>02. SPIRITUAL RESILIENCE</h3>
+                        <p style="margin-bottom: 1.5rem; color: var(--light-gray);">
+                            Physical strength without spiritual grounding is vanity. We believe in discipline as a form of worship. Hardship is not an accident; it is a forge.
+                        </p>
+                        <blockquote style="border-left: 2px solid var(--gold); padding-left: 1rem; font-style: italic; color: var(--white);">
+                            "But I discipline my body and bring it into subjection..."
+                        </blockquote>
+                    </div>
+                </div>
+            </article>
+        `,
 
-                <button class="btn-gold" id="add-calendar-btn" style="margin-top:2rem;">ADD TO CALENDAR (.ICS)</button>
-            </div>
-        </section>
-    `
-};
+        coaching: `
+            <article class="page-view">
+                <div style="text-align: center; margin-bottom: 3rem;">
+                    <h1>COACHING TIERS</h1>
+                    <p style="max-width: 600px; margin: 0 auto; color: var(--light-gray);">Professional guidance for those willing to do the work. No shortcuts. No hacks.</p>
+                </div>
 
-// --- DATA ---
-const programsData = [
-    { name: "OCR SPECIALIST", focus: "Speed + Grip", tag: "RACE" },
-    { name: "HYBRID ENGINE", focus: "Run + Lift", tag: "ENDURANCE" },
-    { name: "TACTICAL STRONGMAN", focus: "Odd Objects", tag: "POWER" },
-    { name: "BACKCOUNTRY HUNTER", focus: "Rucking + Durability", tag: "FIELD" },
-    { name: "OLYMPIC LIFTING", focus: "Explosive Power", tag: "TECHNIQUE" },
-    { name: "POWERLIFTING", focus: "Raw Strength", tag: "FORCE" },
-];
+                <div class="grid-system">
+                    <div class="card" style="border-color: var(--gold);">
+                        <div class="card-header">
+                            <span class="card-tag">TIER 1 // ELITE</span>
+                            <h3>1:1 PERFORMANCE</h3>
+                        </div>
+                        <div class="card-body">
+                            <p>Fully individualized programming tailored to your physiology and race calendar.</p>
+                            <ul class="tech-list">
+                                <li>Custom Training Blocks</li>
+                                <li>Nutrition & Macro Audits</li>
+                                <li>Weekly Video Check-ins</li>
+                                <li>Race Strategy Formulation</li>
+                            </ul>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn-gold" style="width: 100%">APPLY FOR SELECTION</button>
+                        </div>
+                    </div>
 
-// --- 1. LOADER LOGIC ---
-// NOTE: NKJV Isaiah 40:31 text placeholder as requested.
-const VERSERAW = "But those who wait on the Lord Shall renew their strength; They shall mount up with wings like eagles, They shall run and not be weary, They shall walk and not faint.";
-const VERSE_CITE = " // ISAIAH 40:31";
+                    <div class="card">
+                         <div class="card-header">
+                            <span class="card-tag">TIER 2 // SQUAD</span>
+                            <h3>HYBRID GROUP</h3>
+                        </div>
+                        <div class="card-body">
+                            <p>Join the team track. Follow the exact programming used by our competitive athletes.</p>
+                             <ul class="tech-list">
+                                <li>Daily Workout App Access</li>
+                                <li>Leaderboard Competition</li>
+                                <li>Community Discord Channel</li>
+                                <li>Movement Library</li>
+                            </ul>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn-outline" style="width: 100%">JOIN WAITLIST</button>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        `,
 
-function initLoader() {
-    const textContainer = document.getElementById('verse-container');
-    const brandFlash = document.getElementById('brand-flash');
-    const overlay = document.getElementById('loader-overlay');
+        programs: `
+            <article class="page-view">
+                <h1>FIELD MANUALS</h1>
+                <p style="color: var(--light-gray); margin-bottom: 2rem;">Standalone operational guides. Download, print, execute.</p>
+                
+                <div class="grid-system" id="program-grid">
+                    </div>
+            </article>
+        `,
 
-    let i = 0;
-    const speed = 30; // Typing speed in ms
+        podcast: `
+            <article class="page-view">
+                <div style="background: var(--dark-gray); padding: 3rem; border: 1px solid var(--mid-gray); text-align: center; margin-bottom: 3rem;">
+                    <span class="mono-text gold-text">LATEST TRANSMISSION</span>
+                    <h2 style="margin: 1rem 0;">EP. 042: THE MYTH OF BALANCE</h2>
+                    <p style="margin-bottom: 2rem;">We discuss why "balance" is a trap and how obsession fuels greatness.</p>
+                    <div style="display: flex; gap: 1rem; justify-content: center;">
+                        <button class="btn-gold" onclick="window.open('#', '_blank')">WATCH ON YOUTUBE</button>
+                        <button class="btn-outline" onclick="window.open('#', '_blank')">RUMBLE (UNCENSORED)</button>
+                    </div>
+                </div>
 
-    function typeWriter() {
-        if (i < VERSERAW.length) {
-            textContainer.innerHTML += VERSERAW.charAt(i);
-            i++;
-            setTimeout(typeWriter, speed);
-        } else {
-            // Finished typing, show reference
-            textContainer.innerHTML += `<span style='color:#B08D57'>${VERSE_CITE}</span>`;
-            setTimeout(() => {
-                brandFlash.style.opacity = '1';
-                brandFlash.style.transform = 'scale(1)';
+                <h3>ARCHIVE</h3>
+                <div class="grid-system">
+                    <div class="card">
+                        <span class="card-tag">EPISODE 041</span>
+                        <h4>NUTRITION FOR THE APOCALYPSE</h4>
+                        <p class="small">Metabolic flexibility and survival.</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-tag">EPISODE 040</span>
+                        <h4>FATHERHOOD & LEADERSHIP</h4>
+                        <p class="small">Leading your family with conviction.</p>
+                    </div>
+                </div>
+            </article>
+        `,
 
+        events: `
+            <article class="page-view">
+                <h1>MISSION EVENTS</h1>
+                
+                <div style="border-left: 4px solid var(--gold); padding-left: 2rem; background: rgba(255,255,255,0.02); padding: 2rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap;">
+                        <div>
+                            <h2>KICKOFF WEEKEND '26</h2>
+                            <p class="mono-text gold-text">DATE: 12-13 SEP 2026 // LOC: QUEEN CREEK, AZ</p>
+                        </div>
+                        <div style="text-align: right; margin-top: 1rem;">
+                            <span class="card-tag" style="border: 1px solid var(--gold); padding: 5px;">STATUS: CONFIRMED</span>
+                        </div>
+                    </div>
+
+                    <p style="margin: 1.5rem 0; font-size: 1.1rem;">
+                        The inaugural gathering of The Active Mission community. Two days of tactical fitness, theology workshops, and field recovery sessions.
+                    </p>
+
+                    <h4>ITINERARY</h4>
+                    <ul class="tech-list" style="margin-bottom: 2rem;">
+                        <li>0600: Team Ruck March (30lbs Payload)</li>
+                        <li>0900: Sandbag & Stone Lifting Workshop</li>
+                        <li>1300: "The Theology of Strength" Lecture</li>
+                        <li>1800: BBQ & Fellowship</li>
+                    </ul>
+
+                    <button class="btn-gold" id="add-calendar-btn">ADD TO CALENDAR (.ICS)</button>
+                </div>
+            </article>
+        `
+    },
+
+    // --- INIT ---
+    init: function () {
+        this.runLoader();
+        this.startClock();
+        this.getGeo();
+        this.setupNav();
+        this.setupModals();
+    },
+
+    // --- LOADER ---
+    runLoader: function () {
+        // NKJV Text
+        const verseText = "But those who wait on the Lord Shall renew their strength; They shall mount up with wings like eagles, They shall run and not be weary, They shall walk and not faint.";
+        const container = document.getElementById('verse-container');
+        const loader = document.getElementById('loader-overlay');
+        const flash = document.getElementById('brand-flash');
+
+        let i = 0;
+        const type = () => {
+            if (i < verseText.length) {
+                container.textContent += verseText.charAt(i);
+                i++;
+                setTimeout(type, 25);
+            } else {
+                container.innerHTML += "<br><br><span class='gold-text'>// ISAIAH 40:31</span>";
                 setTimeout(() => {
-                    // Fade out loader
-                    overlay.style.transition = "opacity 0.8s ease";
-                    overlay.style.opacity = '0';
-                    setTimeout(() => overlay.remove(), 800);
-
-                    // Init Content
-                    app.router('home');
-                }, 1500);
-            }, 500);
-        }
-    }
-
-    // Start typing after short delay
-    setTimeout(typeWriter, 500);
-}
-
-// --- 2. HUD & TIME LOGIC ---
-function updateHUD() {
-    // Mission Timer (Time on Page)
-    const now = Date.now();
-    const diff = new Date(now - app.startTime);
-    const h = String(diff.getUTCHours()).padStart(2, '0');
-    const m = String(diff.getUTCMinutes()).padStart(2, '0');
-    const s = String(diff.getUTCSeconds()).padStart(2, '0');
-    document.getElementById('mission-timer').innerText = `T+${h}:${m}:${s}`;
-
-    // Local Military Time
-    const local = new Date();
-    const lm = String(local.getHours()).padStart(2, '0');
-    const ls = String(local.getMinutes()).padStart(2, '0');
-    document.getElementById('clock-display').innerText = `LOCAL ${lm}:${ls}`;
-
-    requestAnimationFrame(updateHUD);
-}
-
-// Geolocation
-function initGeo() {
-    const el = document.getElementById('geo-display');
-    if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const lat = position.coords.latitude.toFixed(4);
-                const lon = position.coords.longitude.toFixed(4);
-                el.innerText = `LAT:${lat} LON:${lon}`;
-                el.style.color = "var(--gold)";
-            },
-            (error) => {
-                el.innerText = "COORDS: PERMISSION DENIED";
-                el.style.color = "#555";
+                    flash.style.opacity = '1';
+                    flash.style.transform = 'scale(1)';
+                    setTimeout(() => {
+                        loader.style.opacity = '0';
+                        loader.style.pointerEvents = 'none';
+                        // Initial Route
+                        this.router('home');
+                    }, 1500);
+                }, 800);
             }
-        );
-    } else {
-        el.innerText = "COORDS: N/A";
-    }
-}
+        };
+        setTimeout(type, 500);
+    },
 
-// --- 3. ROUTER ---
-app.router = function (pageName) {
-    if (pageName === 'store') {
-        window.open('https://shopify.com', '_blank'); // Placeholder
-        return;
-    }
+    // --- ROUTER ---
+    router: function (page) {
+        if (!this.content[page]) return;
 
-    const container = document.getElementById('app-container');
-    const navBtns = document.querySelectorAll('.nav-btn');
+        // Update Content
+        const container = document.getElementById('app-container');
+        container.innerHTML = this.content[page];
 
-    // Update Nav
-    navBtns.forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.target === pageName);
-    });
-
-    // Content Swap with Fade
-    container.style.opacity = 0;
-
-    setTimeout(() => {
-        // Inject Template
-        container.innerHTML = templates[pageName] || templates['home'];
-
-        // Dynamic Logic for specific pages
-        if (pageName === 'programs') renderPrograms();
-        if (pageName === 'events') attachEventLogic();
-
-        // Fade In
-        container.style.opacity = 1;
-
-        // Animate Sections inside
-        const sections = container.querySelectorAll('section');
-        sections.forEach(s => {
-            s.classList.add('page-section', 'active');
-            setTimeout(() => s.classList.add('fade-in'), 50);
+        // Update Nav State
+        document.querySelectorAll('.nav-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.target === page);
         });
 
+        // Specific Page Logic
+        if (page === 'programs') this.renderPrograms();
+        if (page === 'events') this.attachCalendarLogic();
+
+        // Scroll Top
         window.scrollTo(0, 0);
-    }, 300);
-};
 
-// --- 4. PAGE SPECIFIC LOGIC ---
+        // Focus Management for A11y
+        container.focus();
+    },
 
-function renderPrograms() {
-    const grid = document.getElementById('program-grid');
-    programsData.forEach(prog => {
-        grid.innerHTML += `
+    // --- DATA RENDERERS ---
+    renderPrograms: function () {
+        const data = [
+            { t: "OCR SPECIALIST", d: "Grip strength & running speed.", c: "RACE" },
+            { t: "HYBRID ENGINE", d: "Concurrent strength & endurance.", c: "BUILD" },
+            { t: "TACTICAL STRONGMAN", d: "Odd objects & raw power.", c: "FORCE" },
+            { t: "BACKCOUNTRY HUNTER", d: "Rucking & durability.", c: "FIELD" },
+            { t: "OLYMPIC LIFTING", d: "Explosive speed strength.", c: "TECH" },
+            { t: "POWERLIFTING", d: "Maximal force production.", c: "RAW" },
+        ];
+
+        const grid = document.getElementById('program-grid');
+        grid.innerHTML = data.map(item => `
             <div class="card">
-                <span class="card-tag">FOCUS: ${prog.tag}</span>
-                <h3>${prog.name}</h3>
-                <p>Output: ${prog.focus}</p>
-                <div class="program-specs">
-                   <button class="btn-outline" style="width:100%; font-size:0.8rem" disabled>COMING SOON</button>
-                   <div style="margin-top:5px; font-size:0.7rem; text-align:center">NOTIFY ME</div>
+                <div class="card-header">
+                    <span class="card-tag">FOCUS: ${item.c}</span>
+                    <h3>${item.t}</h3>
+                </div>
+                <div class="card-body">
+                    <p>${item.d}</p>
+                </div>
+                <div class="card-footer">
+                    <button class="btn-outline" style="width:100%; font-size:0.9rem" disabled>COMING SOON</button>
                 </div>
             </div>
-        `;
-    });
-}
+        `).join('');
+    },
 
-function attachEventLogic() {
-    const btn = document.getElementById('add-calendar-btn');
-    if (btn) {
-        btn.addEventListener('click', () => {
-            // Using the ics.js utility
-            const cal = ics();
-            cal.addEvent('The Active Mission Kickoff', 'Training, Fellowship, Field Work', 'Queen Creek, AZ', '09/12/2026', '09/13/2026');
-            cal.download('ActiveMission_Kickoff');
+    attachCalendarLogic: function () {
+        const btn = document.getElementById('add-calendar-btn');
+        if (btn) {
+            btn.addEventListener('click', () => {
+                const cal = ics();
+                cal.addEvent('Active Mission Kickoff', 'Training & Fellowship', 'Queen Creek AZ', '09/12/2026', '09/13/2026');
+                cal.download('ActiveMission_Kickoff');
+            });
+        }
+    },
+
+    // --- HUD UTILS ---
+    startClock: function () {
+        setInterval(() => {
+            // Mission Time
+            const now = Date.now();
+            const diff = new Date(now - this.state.startTime);
+            document.getElementById('mission-timer').textContent = diff.toISOString().substr(11, 8);
+
+            // Local Time
+            const d = new Date();
+            const h = String(d.getHours()).padStart(2, '0');
+            const m = String(d.getMinutes()).padStart(2, '0');
+            document.getElementById('clock-display').textContent = `${h}${m}`;
+        }, 1000);
+    },
+
+    getGeo: function () {
+        const el = document.getElementById('geo-display');
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                p => el.textContent = `${p.coords.latitude.toFixed(4)}, ${p.coords.longitude.toFixed(4)}`,
+                e => el.textContent = "SAT_UPLINK: DENIED"
+            );
+        } else {
+            el.textContent = "NO GPS MODULE";
+        }
+    },
+
+    setupNav: function () {
+        document.querySelectorAll('.nav-btn:not(.external)').forEach(btn => {
+            btn.addEventListener('click', () => this.router(btn.dataset.target));
+        });
+    },
+
+    setupModals: function () {
+        const modal = document.getElementById('readiness-modal');
+        const trigger = document.getElementById('readiness-trigger');
+        const close = document.getElementById('close-readiness');
+
+        trigger.addEventListener('click', () => modal.showModal());
+        close.addEventListener('click', () => modal.close());
+
+        // Close on backdrop click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.close();
         });
     }
-}
+};
 
-// --- 5. UI INTERACTIONS ---
-
-// Mobile Sticky CTA Scroll Logic
-window.addEventListener('scroll', () => {
-    const sticky = document.querySelector('.mobile-sticky-cta');
-    if (window.scrollY > 300) sticky.classList.add('visible');
-    else sticky.classList.remove('visible');
-});
-
-// Readiness Modal
-document.getElementById('readiness-trigger').addEventListener('click', () => {
-    document.getElementById('readiness-modal').classList.remove('hidden');
-});
-document.getElementById('close-readiness').addEventListener('click', () => {
-    document.getElementById('readiness-modal').classList.add('hidden');
-});
-
-// --- INITIALIZATION ---
-document.addEventListener('DOMContentLoaded', () => {
-    initLoader();
-    updateHUD();
-    initGeo();
-
-    // Bind Nav
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => app.router(e.target.dataset.target));
-    });
-});
+// Start System
+document.addEventListener('DOMContentLoaded', () => app.init());

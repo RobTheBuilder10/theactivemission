@@ -1,17 +1,20 @@
-// Lightweight Interactive Topography
-// Draws sine waves that simulate elevation lines and react to mouse
+/**
+ * TOPOGRAPHY RENDERER
+ * High Performance Canvas 2D
+ */
 
 const canvas = document.getElementById('topo-canvas');
 const ctx = canvas.getContext('2d');
 
 let width, height;
 let lines = [];
-const gap = 40; // Distance between lines
-let offset = 0; // Animation tick
+let offset = 0;
 
-// Mouse interaction
-let mouse = { x: 0, y: 0 };
-let targetMouse = { x: 0, y: 0 };
+// Config
+const GAP = 50;
+const AMPLITUDE_BASE = 20;
+const COLOR = 'rgba(198, 166, 109, 0.35)'; // Visible Gold
+const LINE_WIDTH = 1.5;
 
 function resize() {
     width = canvas.width = window.innerWidth;
@@ -21,46 +24,48 @@ function resize() {
 
 function initLines() {
     lines = [];
-    // Create horizontal lines
-    for (let y = 0; y < height + gap; y += gap) {
+    // Create lines covering the screen
+    for (let y = 0; y < height + GAP; y += GAP) {
         lines.push({
             y: y,
-            baseY: y,
-            amplitude: 15 + Math.random() * 20,
-            speed: 0.002 + Math.random() * 0.002,
-            phase: Math.random() * Math.PI * 2
+            phase: Math.random() * Math.PI * 2,
+            speed: 0.002 + Math.random() * 0.003
         });
     }
 }
 
+// Mouse Interaction
+let mouse = { x: -1000, y: -1000 };
+window.addEventListener('mousemove', e => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+});
+
 function animate() {
+    // Clear with slight transparency hack isn't needed here, just clean wipe
     ctx.clearRect(0, 0, width, height);
 
-    // Smooth mouse lerp
-    mouse.x += (targetMouse.x - mouse.x) * 0.05;
-    mouse.y += (targetMouse.y - mouse.y) * 0.05;
-
     ctx.beginPath();
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'; // Subtle white lines
-    ctx.lineWidth = 1;
-
-    offset += 0.01;
+    ctx.strokeStyle = COLOR;
+    ctx.lineWidth = LINE_WIDTH;
 
     lines.forEach(line => {
         ctx.moveTo(0, line.y);
 
-        for (let x = 0; x <= width; x += 20) {
-            // Base wave movement
-            let y = line.baseY + Math.sin(x * 0.005 + line.phase + offset) * line.amplitude;
+        // Draw segments
+        for (let x = 0; x <= width; x += 15) {
+            // Base Wave
+            let y = line.y + Math.sin(x * 0.005 + line.phase + offset * line.speed) * AMPLITUDE_BASE;
 
-            // Mouse interaction (elevation pull)
-            const dist = Math.hypot(x - mouse.x, y - mouse.y);
+            // Mouse Influence (The "Ripple")
+            const dx = x - mouse.x;
+            const dy = y - mouse.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
             const maxDist = 200;
 
             if (dist < maxDist) {
                 const force = (maxDist - dist) / maxDist;
-                // Pull lines down or push up near mouse
-                y += force * 40;
+                y += force * 40 * Math.sin(dist * 0.1 - offset * 5);
             }
 
             ctx.lineTo(x, y);
@@ -68,15 +73,17 @@ function animate() {
     });
 
     ctx.stroke();
-    requestAnimationFrame(animate);
+
+    offset += 1; // Animation Tick
+
+    // Accessibility Check
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!prefersReducedMotion) {
+        requestAnimationFrame(animate);
+    }
 }
 
-window.addEventListener('resize', resize);
-window.addEventListener('mousemove', (e) => {
-    targetMouse.x = e.clientX;
-    targetMouse.y = e.clientY;
-});
-
 // Init
+window.addEventListener('resize', resize);
 resize();
 animate();
