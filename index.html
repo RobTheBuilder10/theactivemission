@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Active Mission | Live Life On Purpose</title>
+    <meta name="description"
+        content="Premium outdoor performance, OCR coaching, and hybrid athlete lifestyle. Live Life On Purpose.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&family=Oswald:wght@400;500;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+
+    <div id="loader-overlay">
+        <div class="loader-content">
+            <div id="verse-container" class="mono-text"></div>
+            <div id="brand-flash">LIVE LIFE ON PURPOSE.</div>
+        </div>
+        <div class="scanline"></div>
+    </div>
+
+    <canvas id="topo-canvas"></canvas>
+
+    <header class="hud-header">
+        <div class="hud-top-bar">
+            <div class="brand">THE ACTIVE MISSION <span class="gold-text">///</span></div>
+            <div class="hud-data">
+                <span id="mission-timer" class="mono-text">T+00:00:00</span>
+                <span class="divider">|</span>
+                <span id="clock-display" class="mono-text">LOCAL 00:00</span>
+            </div>
+        </div>
+
+        <nav class="main-nav">
+            <button class="nav-btn active" data-target="home">BASE</button>
+            <button class="nav-btn" data-target="philosophy">PHILOSOPHY</button>
+            <button class="nav-btn" data-target="coaching">COACHING</button>
+            <button class="nav-btn" data-target="programs">PROGRAMS</button>
+            <button class="nav-btn" data-target="podcast">PODCAST</button>
+            <button class="nav-btn" data-target="events">EVENTS</button>
+            <button class="nav-btn" data-target="store">STORE</button>
+        </nav>
+    </header>
+
+    <div class="geo-hud">
+        <div class="hud-label">USER POSITION</div>
+        <div id="geo-display" class="mono-text">COORDS: WAITING...</div>
+        <div class="readiness-toggle" id="readiness-trigger">[ CHECK READINESS ]</div>
+    </div>
+
+    <div class="mobile-sticky-cta">
+        <button class="btn-gold" onclick="app.router('coaching')">START TRAINING</button>
+        <button class="btn-outline" onclick="app.router('programs')">VIEW PROGRAMS</button>
+    </div>
+
+    <main id="app-container">
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-grid">
+            <div class="col">
+                <h4>THE ACTIVE MISSION</h4>
+                <p class="mono-text">EST. 2024 // QUEEN CREEK, AZ</p>
+                <p>Live Life On Purpose.</p>
+            </div>
+            <div class="col">
+                <h4>COMMS</h4>
+                <a href="#">Instagram</a>
+                <a href="#">YouTube</a>
+                <a href="#">Email</a>
+            </div>
+            <div class="col">
+                <h4>NEWSLETTER</h4>
+                <form class="field-form">
+                    <input type="email" placeholder="ENTER EMAIL_">
+                    <button type="button">INIT</button>
+                </form>
+            </div>
+        </div>
+        <div class="disclaimer">
+            &copy; 2025 The Active Mission. All Rights Reserved. Consult a physician before training.
+        </div>
+    </footer>
+
+    <div id="readiness-modal" class="modal hidden">
+        <div class="modal-content field-log">
+            <h3>DAILY READINESS LOG</h3>
+            <div class="checklist">
+                <label><input type="checkbox"> <span>SLEEP > 7HRS</span></label>
+                <label><input type="checkbox"> <span>HYDRATION OPTIMAL</span></label>
+                <label><input type="checkbox"> <span>JOINT MOBILITY</span></label>
+                <label><input type="checkbox"> <span>MENTAL CLARITY</span></label>
+            </div>
+            <button id="close-readiness" class="btn-outline">CLOSE LOG</button>
+        </div>
+    </div>
+
+    <script src="assets/js/ics.js"></script>
+    <script src="assets/js/topography.js"></script>
+    <script src="assets/js/main.js"></script>
+</body>
+
+</html>
